@@ -17,10 +17,12 @@ classdef Lens < Propagator
             phase0(obj.r > antenna_r) = 0;
         end
             
-        function lens = makephaselens(obj, coeffs, antenna_r)
+        function lens = makephaselens(obj, coeffs, antenna_r, padding)
             phase0 = obj.phaseprofile(coeffs, antenna_r);
             lens = exp(1i*phase0);
-            lens(obj.r > antenna_r) = 0;
+            if padding == 0
+                lens(obj.r > antenna_r) = 0;
+            end
         end
         
         function u1 = lenspropagate(obj, u0, lens, z1, z2)
@@ -29,11 +31,15 @@ classdef Lens < Propagator
             u1 =  obj.prop(afterlens, z2);
         end
         
-         function lens = makecplens(obj, z1, z2, antenna_r)
+         function lens = makecplens(obj, z1, z2, antenna_r, padding)
             R1 = sqrt(obj.X.^2+obj.Y.^2+z1^2);
             R2 = sqrt(obj.X.^2+obj.Y.^2+z2^2);
             lens = exp(1i*(2*pi/obj.lambda)*(R1+R2));
-            lens(obj.r > antenna_r) = 0;
+            if padding == 0
+                lens(obj.r > antenna_r) = 0;
+            elseif padding == 1
+                lens(obj.r > antenna_r) = 1;
+            end
         end
         
         
