@@ -20,8 +20,8 @@ classdef LensOptimizer < Lens
             source = obj.pso(0,0 , obj.z1);
             lens = obj.makecplens(obj.z1, obj.z2, obj.antenna_r, 0);
             center = obj.lenspropagate(source, lens, obj.z1, obj.z2);
-            xshiftblocks = fix(obj.z1*sind(xangle)/obj.dx);
-            yshiftblocks = fix(obj.z1*sind(yangle)/obj.dx);
+            xshiftblocks = fix(obj.z2*sind(xangle)/obj.dx);
+            yshiftblocks = fix(obj.z2*sind(yangle)/obj.dx);
             u1 = circshift(center, [yshiftblocks, xshiftblocks]);            
         end
         

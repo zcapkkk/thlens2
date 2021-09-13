@@ -72,7 +72,7 @@ for angles = 1:length(xangles)
         % cascade
         for j = 1:length(coeffs)
             new_coeffs = coeffs;
-            new_coeffs(j) = new_coeffs(j) + 0.1*rand(1,1);
+            new_coeffs(j) = new_coeffs(j) + 0.001*rand(1,1);
             aperlens = l.makephaselens(new_coeffs, antenna_r, 1);
             apu1 = l.lenspropagate(u0, aperlens, 0, z2);
             j_error = loptim.field2error(apu1, ndemou1, dblim);
@@ -123,7 +123,7 @@ colorbar;
 
 %% Testing the lens
 
-hornangle = 50;
+hornangle = 40;
 
 % make source
 pointsource = p.pso(hornangle, 0, z1);
@@ -163,6 +163,7 @@ cperror = immse(ndemou1, ncpu1);
 figure;
 subplot(121);
 imagesc(p.x, p.y, ncpu1);
+title(["Regular Lens at ", int2str(hornangle)," degrees"]);
 caxis([-20 0]);
 axis square;
 colormap jet;
@@ -170,6 +171,7 @@ colorbar;
 
 subplot(122);
 imagesc(p.x, p.y, napu1);
+title(["Aperture Lens at ", int2str(hornangle)," degrees"]);
 axis square;
 colormap jet;
 caxis([-20 0]);
