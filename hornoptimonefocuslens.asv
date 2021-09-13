@@ -39,7 +39,7 @@ horny = 1e-3*(-10:0.2:10);
 
 
 % initialize coefficients
-coeffs = [-13.5078 22.5578 -5.3161 6.8526 -2.1028];
+coeffs = [0.0 0.0 0.0 0.0 0.0];
 % aperlens = l.makephaselens(coeffs, antenna_r, 1);   
 % training
 steps = 100;
@@ -83,7 +83,7 @@ for angles = 1:length(xangles)
                 coeffs = new_coeffs;
             else
                 prob = exp(-del_error/T);
-                if rand(1,1) < prob
+                if rand(1,1) > prob
                     coeffs = new_coeffs;
                 end
             end
@@ -197,6 +197,3 @@ buildlensphase = buildlensphase + 180;
 buildlensphase(p.X.^2+p.Y.^2>antenna_r^2) = 0;
 buildlensphase = buildlensphase(st:ed, st:ed);
 writematrix(buildlensphase, 'Lenses/aperturelens.xlsx');
-
-% 13/9 1845 
-% coeffs = [-13.257440755047092  22.817438177933152  -5.072199588228340 7.110879608391324  -1.859533046641054]

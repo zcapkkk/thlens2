@@ -31,7 +31,7 @@ classdef Lens < Propagator
             u1 =  obj.prop(afterlens, z2);
         end
         
-         function lens = makecplens(obj, z1, z2, antenna_r, padding)
+        function lens = makecplens(obj, z1, z2, antenna_r, padding)
             R1 = sqrt(obj.X.^2+obj.Y.^2+z1^2);
             R2 = sqrt(obj.X.^2+obj.Y.^2+z2^2);
             lens = exp(1i*(2*pi/obj.lambda)*(R1+R2));
@@ -42,6 +42,20 @@ classdef Lens < Propagator
             end
         end
         
+        function thickness = cpthickness(obj, z1, z2)
+            R1 = sqrt(obj.X.^2+obj.Y.^2+z1^2);
+            R2 = sqrt(obj.X.^2+obj.Y.^2+z2^2);
+            thickness =(2*pi/obj.lambda)*(R1+R2);
+        end
+        
+        function lens = makelensfromthickness(obj, thickness, antenna_r, padding)
+            lens = exp(1i*thickness);
+            if padding == 0
+                lens(obj.r > antenna_r) = 0;
+            elseif padding == 1
+                lens(obj.r > antenna_r) = 1;
+            end
+        end
         
     end
 end
