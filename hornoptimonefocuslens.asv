@@ -7,7 +7,7 @@ addpath('./HornData/Dist56');
 lambda = 1e-3;
 k0 = 2*pi/lambda;
 antenna_r = 10e-3;
-dx = 0.5*lambda;
+dx = (1/3)*lambda;
 L = 200e-3;
 M = L/dx + 1;
 z1 = 56e-3;
@@ -39,7 +39,7 @@ horny = 1e-3*(-10:0.2:10);
 
 
 % initialize coefficients
-coeffs = [0.0 0.0 0.0 0.0 0.0];
+coeffs = [2.459406267497484   2.430296972020067   2.417060174325630   2.413452222152528   2.454022316570370];
 % aperlens = l.makephaselens(coeffs, antenna_r, 1);   
 % training
 steps = 100;
@@ -58,23 +58,22 @@ for angles = 1:length(xangles)
 
 
     ampdata = readmatrix(int2str(xangles(angles))+"deg_Amp");
-    phasedata = readmatrix(int2str(xangles(angles))+"deg_Phase");
-    phasedata = deg2rad(phasedata);
     u0_amp = interp2(Hornx, Horny, ampdata, xx, yy, 'nearest', 0);
     u0 = u0_amp.*exp(1i.*u0_phase);
 
 
     for i = 1:steps
         T = steps - i;
-        aperlens = l.makephaselens(coeffs, antenna_r, 1);
-        apu1 = l.lenspropagate(u0, aperlens, 0, z2);
+        onethickness =l.phaseprofile(coeffs, antenna_r);
+        onelens = l.makelensfromthickness(onethickness, antenna_r, 1);
+        apu1 = l.lenspropagate(u0, onelens, 0, z2);
         i_error = loptim.field2error(apu1, ndemou1, dblim);
         % cascade
         for j = 1:length(coeffs)
             new_coeffs = coeffs;
-            new_coeffs(j) = new_coeffs(j) + 0.001*rand(1,1);
-            aperlens = l.makephaselens(new_coeffs, antenna_r, 1);
-            apu1 = l.lenspropagate(u0, aperlens, 0, z2);
+            new_coeffs(j) = new_coeffs(j) + lr*rand(1,1);
+            onelens = l.makephaselens(new_coeffs, antenna_r, 1);
+            apu1 = l.lenspropagate(u0, onelens, 0, z2);
             j_error = loptim.field2error(apu1, ndemou1, dblim);
             % currently just a one step thing
             % can implement simulated annealing later
@@ -83,7 +82,7 @@ for angles = 1:length(xangles)
                 coeffs = new_coeffs;
             else
                 prob = exp(-del_error/T);
-                if rand(1,1) > prob
+                if rand(1,1) < prob
                     coeffs = new_coeffs;
                 end
             end
@@ -92,14 +91,15 @@ for angles = 1:length(xangles)
 %     disp([i, coeffs])          
 end
 
-aperlens = l.makephaselens(coeffs, antenna_r, 1);
+onethickness = l.phaseprofile(coeffs, antenna_r);
+onelens = l.makelensfromthickness(onethickness, antenna_r, 1);
 
 
 
 
 figure('Name', 'Phase profile');
 subplot(131);
-pf = 0;
+pf = k0*(sqrt(p.x.^2 + z1^2) + sqrt(p.x.^2 + z2^2));
 for i = 1:length(coeffs)
     pf = pf + coeffs(i)*(p.x/antenna_r).^(2*i);
 end
@@ -107,7 +107,7 @@ plot(p.x, pf);
 xlim([-antenna_r antenna_r]);
 axis square;
 subplot(132);
-aperlensphase = angle(aperlens);
+aperlensphase = angle(onelens);
 plot(p.x, aperlensphase(ceil(M/2),:));
 xlim([-antenna_r antenna_r]);
 axis square;
@@ -123,7 +123,7 @@ colorbar;
 
 %% Testing the lens
 
-hornangle = 40;
+hornangle = 0;
 
 % make source
 pointsource = p.pso(hornangle, 0, z1);
@@ -137,7 +137,7 @@ u0_amp = interp2(Hornx, Horny, ampdata, xx, yy, 'nearest', 0);
 u0 = u0_amp.*exp(1i.*u0_phase);
 
 % aperture lens
-apu1 = l.lenspropagate(u0, aperlens, 0, z2);
+apu1 = l.lenspropagate(u0, onelens, 0, z2);
 napu1 = normdb(apu1);
 napu1csection = napu1(ceil(M/2),:);
 
@@ -171,7 +171,7 @@ colorbar;
 
 subplot(122);
 imagesc(p.x, p.y, napu1);
-title(["Aperture Lens at ", int2str(hornangle)," degrees"]);
+title(["My Lens at ", int2str(hornangle)," degrees"]);
 axis square;
 colormap jet;
 caxis([-20 0]);
@@ -183,7 +183,7 @@ hold on;
 plot(p.x, napu1csection);
 % plot(p.x, ndemou1(ceil(M/2),:));
 hold off;
-legend("cp lens", "aper lens");
+legend("cp lens", "My lens");
 title("Cross section intensity profile");
 
 %% Export the lens
@@ -196,4 +196,6 @@ buildlensphase = rad2deg(aperlensphase);
 buildlensphase = buildlensphase + 180;
 buildlensphase(p.X.^2+p.Y.^2>antenna_r^2) = 0;
 buildlensphase = buildlensphase(st:ed, st:ed);
-writematrix(buildlensphase, 'Lenses/aperturelens.xlsx');
+writematrix(buildlensphase, 'Lenses/onefocuslens.xlsx');
+
+%coeffs = [2.713996855140763   2.668819432357530   2.667445112427298   2.662972836726064   2.702888916173400]

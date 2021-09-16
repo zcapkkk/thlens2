@@ -7,9 +7,9 @@ addpath('./HornData/Dist56');
 lambda = 1e-3;
 k0 = 2*pi/lambda;
 antenna_r = 10e-3;
-dx = 0.5*lambda;
+dx = (1/3)*lambda;
 L = 200e-3;
-M = L/dx + 1;
+M = round(L/dx) + 1;
 z1 = 56e-3;
 z2 = 40e-3;
 dblim = -25;
@@ -23,7 +23,7 @@ loptim = LensOptimizer(L, lambda, dx, z1, z2, antenna_r);
 normdb = @(u1) mag2db(abs(u1)) - max(max(mag2db(abs(u1))));
 
 
-xangles = [0 30:10:69];
+xangles = [0 30:10:60];
 
 
 
@@ -196,6 +196,7 @@ buildlensphase = rad2deg(aperlensphase);
 buildlensphase = buildlensphase + 180;
 buildlensphase(p.X.^2+p.Y.^2>antenna_r^2) = 0;
 buildlensphase = buildlensphase(st:ed, st:ed);
+delete 'Lenses/onefocuslens.xlsx';
 writematrix(buildlensphase, 'Lenses/onefocuslens.xlsx');
 
 %coeffs = [2.713996855140763   2.668819432357530   2.667445112427298   2.662972836726064   2.702888916173400]

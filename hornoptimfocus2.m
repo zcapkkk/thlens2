@@ -7,9 +7,9 @@ addpath('./HornData/Dist56');
 lambda = 1e-3;
 k0 = 2*pi/lambda;
 antenna_r = 10e-3;
-dx = 0.5*lambda;
+dx = (1/3)*lambda;
 L = 200e-3;
-M = L/dx + 1;
+M = round(L/dx) + 1;
 z1 = 56e-3;
 z2 = 40e-3;
 dblim = -25;
@@ -43,64 +43,69 @@ horny = 1e-3*(-10:0.2:10);
 coeffs =  [-13.257589733620399, 22.810501285918946, -5.075819033570514,...
     7.082499034482761, -1.882158081684554];
 aperlens = l.makephaselens(coeffs, antenna_r, 1); 
-coeffs = [-50.0228 -291.0979 153.7385 -45.8029 5.7907];
-focuslens = l.makecplens(z1+zmid, z2, 
+coeffs = [2.459406267497484   2.430296972020067   2.417060174325630   2.413452222152528   2.454022316570370];
+% focuslens = l.makecplens(z1+zmid, z2, antenna_r, 1);
 
 
 %% training
-% steps = 100;
-% lr = 1e-3;
-% prev_error = 1e6;
-% 
-% for angles = 1:length(xangles)
-%     % ideal focus
-%     demou1 = loptim.idealcpu1(xangles(angles),0);
-%     ndemou1 = normdb(demou1);
-%     ndemou1csection = ndemou1(ceil(M/2),:);
-%     ndemou1(ndemou1 < dblim) = dblim;
-%     
-%     pointsource = p.pso(xangles(angles), 0, z1);
-%     u0_phase = angle(p.prop(pointsource, z1*cosd(xangles(angles))));
-% 
-% 
-%     ampdata = readmatrix(int2str(xangles(angles))+"deg_Amp");
-%     phasedata = readmatrix(int2str(xangles(angles))+"deg_Phase");
-%     phasedata = deg2rad(phasedata);
-%     u0_amp = interp2(Hornx, Horny, ampdata, xx, yy, 'nearest', 0);
-%     u0 = u0_amp.*exp(1i.*u0_phase);
-% 
-% 
-%     for i = 1:steps
-%         T = steps - i;
-%         aperlens = l.makephaselens(coeffs, antenna_r, 1);
-%         apu1 = l.lenspropagate(u0, aperlens, 0, z2);
-%         i_error = loptim.field2error(apu1, ndemou1, dblim);
-%         % cascade
-%         for j = 1:length(coeffs)
-%             new_coeffs = coeffs;
-%             new_coeffs(j) = new_coeffs(j) + lr*rand(1,1);
-%             aperlens = l.makephaselens(new_coeffs, antenna_r, 1);
-%             apu1 = l.lenspropagate(u0, aperlens, 0, z2);
-%             j_error = loptim.field2error(apu1, ndemou1, dblim);
-%             % currently just a one step thing
-%             % can implement simulated annealing later
-%             del_error = j_error - i_error;
-%             if del_error < 0
-%                 coeffs = new_coeffs;
-%             else
-%                 prob = exp(-del_error/T);
-%                 if rand(1,1) > prob
-%                     coeffs = new_coeffs;
-%                 end
-%             end
-%         end
-%     end
-% %     disp([i, coeffs])          
-% end
-% 
-% aperlens = l.makephaselens(coeffs, antenna_r, 1);
-% 
-% 
+steps = 100;
+lr = 1e-3;
+prev_error = 1e6;
+coeffs = [0 0 0 0 0];
+for angles = 1:length(xangles)
+    % ideal focus
+    demou1 = loptim.idealcpu1(xangles(angles),0);
+    ndemou1 = normdb(demou1);
+    ndemou1csection = ndemou1(ceil(M/2),:);
+    ndemou1(ndemou1 < dblim) = dblim;
+    
+    pointsource = p.pso(xangles(angles), 0, z1);
+    u0_phase = angle(p.prop(pointsource, z1*cosd(xangles(angles))));
+
+
+    ampdata = readmatrix(int2str(xangles(angles))+"deg_Amp");
+    phasedata = readmatrix(int2str(xangles(angles))+"deg_Phase");
+    phasedata = deg2rad(phasedata);
+    u0_amp = interp2(Hornx, Horny, ampdata, xx, yy, 'nearest', 0);
+    u0 = u0_amp.*exp(1i.*u0_phase);
+
+
+    for i = 1:steps
+        T = steps - i;
+        focusthickness = l.phaseprofile(coeffs, antenna_r);
+        focuslens = l.makelensfromthickness(focusthickness, antenna_r, 1);
+        apu1 = l.lenspropagate(u0, aperlens, 0, zmid);
+        apu1 = l.lenspropagate(apu1, focuslens, 0, z2);
+        i_error = loptim.field2error(apu1, ndemou1, dblim);
+        % cascade
+        for j = 1:length(coeffs)
+            new_coeffs = coeffs;
+            new_coeffs(j) = new_coeffs(j) + lr*rand(1,1);
+            focusthickness =l.phaseprofile(new_coeffs, antenna_r);
+            focuslens = l.makelensfromthickness(focusthickness, antenna_r, 1);
+            apu1 = l.lenspropagate(u0, aperlens, 0, zmid);
+            apu1 = l.lenspropagate(apu1, focuslens, 0, z2);
+            j_error = loptim.field2error(apu1, ndemou1, dblim);
+            % currently just a one step thing
+            % can implement simulated annealing later
+            del_error = j_error - i_error;
+            if del_error < 0
+                coeffs = new_coeffs;
+            else
+                prob = exp(-del_error/T);
+                if rand(1,1) < prob
+                    coeffs = new_coeffs;
+                end
+            end
+        end
+    end
+%     disp([i, coeffs])          
+end
+
+focusthickness =l.phaseprofile(coeffs, antenna_r);
+focuslens = l.makelensfromthickness(focusthickness, antenna_r, 1);
+
+
 %% Plotting
 
 figure('Name', 'Phase profile');
@@ -129,7 +134,7 @@ colorbar;
 
 %% Testing the lens
 
-hornangle = 0;
+hornangle = 40;
 
 % make source
 pointsource = p.pso(hornangle, 0, z1);
@@ -144,7 +149,7 @@ u0 = u0_amp.*exp(1i.*u0_phase);
 
 % aperture lens
 apu1 = l.lenspropagate(u0, aperlens, 0, zmid);
-apu1 = l.lenspropagate(apu1, focuslens, 0, z2-zmid);
+apu1 = l.lenspropagate(apu1, focuslens, 0, z2);
 napu1 = normdb(apu1);
 napu1csection = napu1(ceil(M/2),:);
 
@@ -203,4 +208,5 @@ buildfocuslensphase = rad2deg(focuslensphase);
 buildfocuslensphase = buildfocuslensphase + 180;
 buildfocuslensphase(p.X.^2+p.Y.^2>antenna_r^2) = 0;
 buildfocuslensphase = buildfocuslensphase(st:ed, st:ed);
-writematrix(buildfocuslensphase, 'Lenses/focuslens.xlsx');
+delete 'Lenses/focuslens2.xlsx';
+writematrix(buildfocuslensphase, 'Lenses/focuslens2.xlsx');

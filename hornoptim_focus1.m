@@ -7,9 +7,9 @@ addpath('./HornData/Dist56');
 lambda = 1e-3;
 k0 = 2*pi/lambda;
 antenna_r = 10e-3;
-dx = 0.5*lambda;
+dx = (1/3)*lambda;
 L = 200e-3;
-M = L/dx + 1;
+M = round(L/dx) + 1;
 z1 = 56e-3;
 z2 = 40e-3;
 dblim = -25;
@@ -24,7 +24,7 @@ loptim = LensOptimizer(L, lambda, dx, z1, z2, antenna_r);
 normdb = @(u1) mag2db(abs(u1)) - max(max(mag2db(abs(u1))));
 
 
-xangles = [0 30:10:69];
+xangles = [0 30:10:60];
 
 
 
@@ -57,7 +57,7 @@ for angles = 1:length(xangles)
     demou1 = loptim.idealcpu1(xangles(angles),0);
     ndemou1 = normdb(demou1);
     ndemou1csection = ndemou1(ceil(M/2),:);
-    ndemou1(ndemou1 < dblim) = dblim;
+%     ndemou1(ndemou1 < dblim) = dblim;
     
     pointsource = p.pso(xangles(angles), 0, z1);
     u0_phase = angle(p.prop(pointsource, z1*cosd(xangles(angles))));
@@ -118,7 +118,7 @@ plot(p.x, pf);
 xlim([-antenna_r antenna_r]);
 axis square;
 subplot(132);
-focuslensphase = angle(focuslens);
+focuslensphase = angle(aperlens);
 plot(p.x, focuslensphase(ceil(M/2),:));
 xlim([-antenna_r antenna_r]);
 axis square;
@@ -134,7 +134,7 @@ colorbar;
 
 %% Testing the lens
 
-hornangle = 50;
+hornangle = 60;
 
 % make source
 pointsource = p.pso(hornangle, 0, z1);
@@ -196,7 +196,7 @@ plot(p.x, napu1csection);
 % plot(p.x, ndemou1(ceil(M/2),:));
 hold off;
 legend("cp lens", "aper lens");
-title("Cross section intensity profile");
+title(["Cross section intensity profile at ",int2str(hornangle)]);
 
 %% Export the lens
 disp(coeffs)
@@ -208,4 +208,5 @@ buildfocuslensphase = rad2deg(focuslensphase);
 buildfocuslensphase = buildfocuslensphase + 180;
 buildfocuslensphase(p.X.^2+p.Y.^2>antenna_r^2) = 0;
 buildfocuslensphase = buildfocuslensphase(st:ed, st:ed);
+delete 'Lenses/focuslens.xlsx';
 writematrix(buildfocuslensphase, 'Lenses/focuslens.xlsx');
