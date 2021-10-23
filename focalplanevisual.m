@@ -87,9 +87,8 @@ for angles = 1:length(xangles)
     name4fig = int2str(xangles(angles)) + " degrees";
     figure("Name", name4fig);
     
-    
-    
-    subplot(131);
+    t = tiledlayout(1,3, 'TileSpacing', 'tight', 'Padding', 'tight');   
+    nexttile;
     imagesc(p.x,p.y,ncpu1);
     [t,s] = title("Conventional", ["Parabolic, ", int2str(xangles(angles))+ " degrees"]);
     colormap jet;
@@ -98,7 +97,7 @@ for angles = 1:length(xangles)
     axis square;
     caxis([dblim 0]);
     
-    subplot(132);
+    nexttile;
     imagesc(p.x,p.y,napu1);
     [t,s] = title("Singlet", ["Polynomial", int2str(xangles(angles))+ " degrees"]);
     colormap jet;
@@ -107,7 +106,7 @@ for angles = 1:length(xangles)
     axis square;
     caxis([dblim 0]);
     
-    subplot(133);
+    nexttile;
     imagesc(p.x,p.y,ndapu1);
     [t,s] = title("Doublet", ["Polynomial + Parabolic", int2str(xangles(angles))+ " degrees"]);
     colormap jet;
@@ -115,6 +114,7 @@ for angles = 1:length(xangles)
     c3.Label.String = "dB";
     axis square;
     caxis([dblim 0]);
+    
 
 
    
