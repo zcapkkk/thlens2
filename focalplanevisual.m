@@ -85,8 +85,10 @@ for angles = 1:length(xangles)
     ndapu1csection = ndapu1(ceil(M/2),:);
     
     name4fig = int2str(xangles(angles)) + " degrees";
-    fig = figure("Name", name4fig);
-    fig.tight_layout();
+    figure("Name", name4fig);
+    
+    
+    
     subplot(131);
     imagesc(p.x,p.y,ncpu1);
     [t,s] = title("Conventional", ["Parabolic, ", int2str(xangles(angles))+ " degrees"]);
