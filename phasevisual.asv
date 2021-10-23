@@ -1,0 +1,23 @@
+close all;
+addpath('./Lenses');
+addpath('./Classes');
+
+
+L = 200e-3;
+lambda = 1e-3;
+dx = (1/3)*lambda;
+
+p = Propagator(L, lambda, dx);
+l = Lens(L, lambda, dx);
+
+
+
+ape = readmatrix('Lenses/aperturelens.xlsx');
+foc = readmatrix('Lenses/focuslens.xlsx');
+
+figure;
+imagesc(p.x, p.y, ape);
+colorbar;
+axis square;
+colormap jet;
+title("Aperture Transmitarray");

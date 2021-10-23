@@ -123,7 +123,7 @@ colorbar;
 
 %% Testing the lens
 
-hornangle = 0;
+hornangle = 50;
 
 % make source
 pointsource = p.pso(hornangle, 0, z1);
@@ -199,4 +199,4 @@ buildlensphase = buildlensphase(st:ed, st:ed);
 delete 'Lenses/onefocuslens.xlsx';
 writematrix(buildlensphase, 'Lenses/onefocuslens.xlsx');
 
-%coeffs = [2.713996855140763   2.668819432357530   2.667445112427298   2.662972836726064   2.702888916173400]
+% coeffs = [2.713996855140763   2.668819432357530   2.667445112427298   2.662972836726064   2.702888916173400]

@@ -134,7 +134,7 @@ colorbar;
 
 %% Testing the lens
 
-hornangle = 60;
+hornangle = 0;
 
 % make source
 pointsource = p.pso(hornangle, 0, z1);
