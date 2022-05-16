@@ -89,31 +89,60 @@ for angles = 1:length(xangles)
     
     t = tiledlayout(1,3, 'TileSpacing', 'tight', 'Padding', 'tight');   
     nexttile;
-    imagesc(p.x,p.y,ncpu1);
+    imagesc(p.x/1e-3,p.y/1e-3,ncpu1);
     [t,s] = title("Conventional", ["Parabolic, ", int2str(xangles(angles))+ " degrees"]);
     colormap jet;
     c1 = colorbar;
     c1.Label.String = "dB";
     axis square;
+    xlim([-30+xangles(angles) 30+xangles(angles)]);
+    ylim([-30 30]);
+    set(gca,'FontName','Times New Roman','FontSize',20,'LineWidth',1)
     caxis([dblim 0]);
     
     nexttile;
-    imagesc(p.x,p.y,napu1);
+    imagesc(p.x/1e-3,p.y/1e-3,napu1);
     [t,s] = title("Singlet", ["Polynomial", int2str(xangles(angles))+ " degrees"]);
     colormap jet;
     c2 = colorbar;
     c2.Label.String = "dB";
+    xlim([-30+xangles(angles) 30+xangles(angles)]);
+    ylim([-30 30]);
     axis square;
+    set(gca,'FontName','Times New Roman','FontSize',20,'LineWidth',1)
     caxis([dblim 0]);
     
     nexttile;
-    imagesc(p.x,p.y,ndapu1);
+    imagesc(p.x/1e-3,p.y/1e-3,ndapu1);
     [t,s] = title("Doublet", ["Polynomial + Parabolic", int2str(xangles(angles))+ " degrees"]);
     colormap jet;
     c3 = colorbar;
     c3.Label.String = "dB";
+    xlim([-30+xangles(angles) 30+xangles(angles)]);
+    ylim([-30 30]);
     axis square;
+    set(gca,'FontName','Times New Roman','FontSize',20,'LineWidth',1)
     caxis([dblim 0]);
+    
+    figure("Name", name4fig);
+    lw = 2.5;
+    plot(p.x/1e-3,ncpu1csection, 'LineWidth', lw);
+    hold on;
+    %plot(p.x/1e-3,napu1csection, 'LineWidth', lw);
+    plot(p.x/1e-3,ndapu1csection, 'LineWidth', lw);
+%     legend(["Parabolic","Polynomial","Doublet"]);
+    legend(["Conventional", "Doublet"]);
+    hold off;
+    caxis([-20 0]);
+    tmp = p.x/1e-3;
+    onedmid = tmp(napu1csection==0);
+    xlim([onedmid-20 onedmid+20]);
+    xlabel("x/mm");
+    ylabel("dB");
+    ylim([-20 0]);
+    title("Cross-section Profile at " + xangles(angles) + " degree(s)");
+    set(gca,'FontName','Times New Roman','FontSize',20,'LineWidth',1)
+    grid on;
     
 
 

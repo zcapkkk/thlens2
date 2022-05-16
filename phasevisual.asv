@@ -1,6 +1,8 @@
+% use for visualizing phase distribution o reflectarray
 close all;
 addpath('./Lenses');
 addpath('./Classes');
+addpath('./MeasData');
 
 
 L = 200e-3;
@@ -12,12 +14,47 @@ l = Lens(L, lambda, dx);
 
 
 
-ape = readmatrix('Lenses/aperturelens.xlsx');
-foc = readmatrix('Lenses/focuslens.xlsx');
+ape = readmatrix('Lenses/1_aperturelens.xlsx');
+foc = readmatrix('Lenses/1_focuslens.xlsx');
 
 figure;
-imagesc(p.x, p.y, ape);
-colorbar;
+imagesc(p.x/lambda, p.y/lambda, ape);
+xlabel('mm');
+ylabel('mm');
 axis square;
 colormap jet;
-title("Aperture Transmitarray");
+title("Aperture Transmitarray", "FontWeight","Normal");
+cape = colorbar;
+cape.Label.String = 'Phase shift (degrees)';
+set(gca,'FontName','Times New Roman','FontSize',18,'LineWidth',1, 'FontWeight','Normal');
+saveas(gcf, 'MeasData/aperture_phase.png');
+
+figure;
+imagesc(p.x/lambda, p.y/lambda, foc);
+xlabel('mm');
+ylabel('mm');
+axis square;
+colormap jet;
+title("Focusing Transmitarray", "FontWeight","Normal");
+cfoc = colorbar;
+cfoc.Label.String = 'Phase shift (degrees)';
+set(gca,'FontName','Times New Roman','FontSize',18,'LineWidth',1);
+saveas(gcf, 'MeasData/focusing_phase.png');
+
+%% Make regular lens
+
+cplens = l.makecplens(z1, z2, antenna_r, 1);
+cplens = angle(cplens)+180;
+figure;
+imagesc(p.x/lambda, p.y/lambda, cplens);
+xlabel('mm');
+ylabel('mm');
+xlim([-10 10]);
+ylim([-10 10]);
+axis square;
+colormap jet;
+title("Conventional Transmitarray", "FontWeight","Normal");
+cfoc = colorbar;
+cfoc.Label.String = 'Phase shift (degrees)';
+set(gca,'FontName','Times New Roman','FontSize',18,'LineWidth',1);
+saveas(gcf, 'MeasData/conventional_phase.png');
