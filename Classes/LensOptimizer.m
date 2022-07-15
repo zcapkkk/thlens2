@@ -25,7 +25,7 @@ classdef LensOptimizer < Lens
             u1 = circshift(center, [yshiftblocks, xshiftblocks]);            
         end
         
-        function u1 = normdb(obj, u1)
+        function u1 = normdb(~, u1)
             u1 = abs(u1);
             u1 = mag2db(u1) - max(max(u1));
         end

@@ -74,7 +74,7 @@ for i = 1:steps
     % cascade
     for j = 1:length(coeffs)
         new_coeffs = coeffs;
-        new_coeffs(j) = new_coeffs(j) + rand(1,1);
+        new_coeffs(j) = new_coeffs(j) + randi([-1,1])*rand(1,1);
         aperlens = l.makephaselens(new_coeffs, antenna_r, 1);
         apu1 = l.lenspropagate(u0, aperlens, 0, z2);
         j_error = loptim.field2error(apu1, ndemou1, dblim);
