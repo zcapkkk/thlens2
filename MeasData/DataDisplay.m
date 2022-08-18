@@ -3,9 +3,9 @@ clear all;close all;
 clc;
 
 
-fname = '20211231_B50deg.mat';
+fname = '20211231_B30deg.mat';
 load(fname);
-for NumPoint = 1:7
+for NumPoint = 1:9
     sz=size(sdata.s21);
     M=sz(1);
     N=sz(2);
@@ -29,12 +29,12 @@ for NumPoint = 1:7
     axis equal;
     xlabel('x');
     ylabel('y');
-    title_string = {'Amp (a.u),',int2str(240+10*NumPoint),'GHz,',fname(11:12),'Deg.'};
+    title_string = {'Amp (a.u),',int2str(230+10*NumPoint),'GHz,',fname(11:12),'Deg.'};
     title_string = strjoin(title_string);
-    file_string = {'./Results/','freq',int2str(240+10*NumPoint),'GHz',fname(11:12),'.png'};
+    file_string = {'./Results/','freq',int2str(230+10*NumPoint),'GHz',fname(11:12),'.png'};
     file_string = strjoin(file_string,'');
     title(title_string);
     set(gca,'FontName','Times New Roman','FontSize',12,'LineWidth',1);
-    saveas(gcf, file_string);
+%     saveas(gcf, file_string);
 end
 

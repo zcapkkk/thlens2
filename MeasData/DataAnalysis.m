@@ -12,7 +12,7 @@ deg50 = "20211231_B50deg.mat";
 degrees = [deg00, deg20, deg30, deg40, deg45, deg50];
 
 for ii = 1:length(degrees)
-    for jj = 1:8
+    for jj = 1:9
         fname = convertStringsToChars(degrees(ii));
         load(fname);
 
@@ -30,8 +30,9 @@ for ii = 1:length(degrees)
             end
         end
         Ex_inc=MagEx.*exp(1i*PhaseEx/180*pi);
-        MagEx=MagEx/max(MagEx(:));
-        MagEx_dB=20*log10(MagEx);
+%         MagEx=MagEx/max(MagEx(:));
+%         MagEx_dB=20*log10(MagEx);
+        MagEx_dB = 20*log10(MagEx);
 % Uncomment to do figure analysis i.e. ellipsis
 %         MagEx = imbinarize(MagEx, -5);
 %         info = regionprops(MagEx, "Eccentricity","MajorAxisLength","MinorAxisLength");
@@ -46,7 +47,8 @@ for ii = 1:length(degrees)
         figure('WindowStyle', 'Docked');
         x_a = -8:0.5:8;
         y_a = 50:-0.5:-10;
-        [max_r, max_c] = find(MagEx_dB==0);
+%         [max_r, max_c] = find(MagEx_dB==0);
+        [max_r, max_c] = find(max(max(MagEx_dB)));
         y_a = y_a - y_a(max_r);
         imagesc(x_a,y_a,MagEx_dB);
         colorbar;
@@ -60,9 +62,10 @@ for ii = 1:length(degrees)
         file_string = {'./Results/','freq',int2str(240+10*NumPoint),'GHz',fname(11:12),'.png'};
         file_string = strjoin(file_string,'');
         title(title_string);
-        caxis([-20 0]);
+%         caxis([-20 0]);
+        caxis([-90 0]);
         set(gca,'FontName','Times New Roman','FontSize',12,'LineWidth',1);
-        saveas(gcf, file_string);
+%         saveas(gcf, file_string);
     end
 end
 

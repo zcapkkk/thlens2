@@ -98,7 +98,7 @@ legend(["$0^\circ$","$30^\circ$","$40^\circ$",...
     "$50^\circ$"],"Interpreter","latex");
 set(gca,'FontName','Times New Roman','FontSize',30,'LineWidth',1);
 xlabel("y (mm)");
-ylabel("dB");
+ylabel("E field intensity (dB)");
 
 figure("Name","Doublet");
 hold on;
@@ -114,4 +114,4 @@ legend(["$0^\circ$","$30^\circ$","$40^\circ$",...
     "$50^\circ$"],"Interpreter","latex");
 set(gca,'FontName','Times New Roman','FontSize',30,'LineWidth',1);
 xlabel("y (mm)");
-ylabel("dB");
+ylabel("E field intensity (dB)");

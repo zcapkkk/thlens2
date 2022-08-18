@@ -1,0 +1,8 @@
+#+TITLE: Scanning Loss
+
+* Scanning Loss
+
+I found the max decibel point for each of the measured field distribution.
+
+Decibel is calculated with 20*log10(amplitude). 
+

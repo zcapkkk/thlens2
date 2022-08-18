@@ -26,8 +26,8 @@ classdef LensOptimizer < Lens
         end
         
         function u1 = normdb(~, u1)
-            u1 = abs(u1);
-            u1 = mag2db(u1) - max(max(u1));
+            u1 = mag2db(abs(u1));
+            u1 = u1 - max(max(u1));
         end
         
         function error = field2error(obj, u1, ideal, dblim)

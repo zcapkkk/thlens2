@@ -22,7 +22,8 @@ loptim = LensOptimizer(L, lambda, dx, z1, z2, antenna_r);
 
 % quick lambda function
 normdb = @(u1) mag2db(abs(u1)) - max(max(mag2db(abs(u1))));
-
+% normdb = @(u1) mag2db(abs(u1))
+% normdb = @(u1) 10*log10(abs(u1))
 
 xangles = [0 30:10:60];
 
